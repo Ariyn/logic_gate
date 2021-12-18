@@ -2,19 +2,34 @@ package logic_gate
 
 import "sync"
 
-var gates = make([]*Gate, 0)
-var wg sync.WaitGroup
+var globalEngine *Engine
 
-func ConnectGateTicker(g *Gate) {
-	gates = append(gates, g)
+func init() {
+	globalEngine = NewEngine()
 }
 
-func Tick() {
-	for _, g := range gates {
-		wg.Add(1)
-		g.tick <- &wg
-	}
-	wg.Wait()
+type Engine struct {
+	gates []Gate
+	wg    sync.WaitGroup
+}
 
-	wg = sync.WaitGroup{}
+func NewEngine() (e *Engine) {
+	return &Engine{
+		gates: make([]Gate, 0),
+	}
+}
+
+func (e *Engine) ConnectGateTicker(g Gate) {
+	e.gates = append(e.gates, g)
+}
+
+func (e *Engine) TickSync() {
+	e.wg = sync.WaitGroup{}
+
+	for _, g := range e.gates {
+		e.wg.Add(1)
+		g.Tick(&e.wg)
+	}
+
+	e.wg.Wait()
 }
