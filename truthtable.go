@@ -20,7 +20,7 @@ type TruthTableGate struct {
 	tick           chan *sync.WaitGroup
 }
 
-func NewGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
+func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
 	tg := &TruthTableGate{
 		ctx:        ctx,
 		inputSize:  inputSize,

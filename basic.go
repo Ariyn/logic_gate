@@ -10,9 +10,9 @@ func BasicGate(ctx context.Context) (g Gate) {
 		1: true,
 	}
 
-	g = NewGate(ctx, 1, 1, truthTable)
-	if globalEngine != nil {
-		globalEngine.ConnectGateTicker(g)
+	g = NewTruthTableGate(ctx, 1, 1, truthTable)
+	if GlobalEngine != nil {
+		GlobalEngine.ConnectGateTicker(g)
 	}
 	return
 }
@@ -37,9 +37,9 @@ func AndGate(ctx context.Context) (g Gate) {
 		3: true,
 	}
 
-	g = NewGate(ctx, 2, 1, truthTable)
-	if globalEngine != nil {
-		globalEngine.ConnectGateTicker(g)
+	g = NewTruthTableGate(ctx, 2, 1, truthTable)
+	if GlobalEngine != nil {
+		GlobalEngine.ConnectGateTicker(g)
 	}
 
 	return g
@@ -53,9 +53,9 @@ func OrGate(ctx context.Context) (g Gate) {
 		3: true,
 	}
 
-	g = NewGate(ctx, 2, 1, truthTable)
-	if globalEngine != nil {
-		globalEngine.ConnectGateTicker(g)
+	g = NewTruthTableGate(ctx, 2, 1, truthTable)
+	if GlobalEngine != nil {
+		GlobalEngine.ConnectGateTicker(g)
 	}
 
 	return g
@@ -67,10 +67,26 @@ func NotGate(ctx context.Context) (g Gate) {
 		1: false,
 	}
 
-	g = NewGate(ctx, 1, 1, truthTable)
-	if globalEngine != nil {
-		globalEngine.ConnectGateTicker(g)
+	g = NewTruthTableGate(ctx, 1, 1, truthTable)
+	if GlobalEngine != nil {
+		GlobalEngine.ConnectGateTicker(g)
 	}
 
 	return g
+}
+
+func XorGate(ctx context.Context) (g Gate) {
+	truthTable := map[int]bool{
+		0: false,
+		1: true,
+		2: true,
+		3: false,
+	}
+
+	g = NewTruthTableGate(ctx, 2, 1, truthTable)
+	if GlobalEngine != nil {
+		GlobalEngine.ConnectGateTicker(g)
+	}
+
+	return
 }

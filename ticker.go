@@ -2,10 +2,10 @@ package logic_gate
 
 import "sync"
 
-var globalEngine *Engine
+var GlobalEngine *Engine
 
 func init() {
-	globalEngine = NewEngine()
+	GlobalEngine = NewEngine()
 }
 
 type Engine struct {
@@ -23,6 +23,7 @@ func (e *Engine) ConnectGateTicker(g Gate) {
 	e.gates = append(e.gates, g)
 }
 
+// TODO: record every gate's status
 func (e *Engine) TickSync() {
 	e.wg = sync.WaitGroup{}
 

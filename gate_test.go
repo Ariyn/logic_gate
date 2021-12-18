@@ -13,13 +13,13 @@ func TestGate(t *testing.T) {
 
 		t.Run("true를 넣었을 때, true가 잘 나오는지", func(t *testing.T) {
 			g.Input(0).Push(true)
-			globalEngine.TickSync()
+			GlobalEngine.TickSync()
 			assert.True(t, g.Output(0).Pop())
 		})
 
 		t.Run("false를 넣었을 때, false가 잘 나오는지", func(t *testing.T) {
 			g.Input(0).Push(false)
-			globalEngine.TickSync()
+			GlobalEngine.TickSync()
 			assert.False(t, g.Output(0).Pop())
 		})
 	})
@@ -51,7 +51,7 @@ func TestGate(t *testing.T) {
 
 				g.Input(0).Push(tt[0])
 				g.Input(1).Push(tt[1])
-				globalEngine.TickSync()
+				GlobalEngine.TickSync()
 
 				assert.Equal(t, tt[2], g.Output(0).Pop())
 			})
@@ -75,7 +75,7 @@ func TestGate(t *testing.T) {
 
 				g.Input(0).Push(tt[0])
 				g.Input(1).Push(tt[1])
-				globalEngine.TickSync()
+				GlobalEngine.TickSync()
 
 				assert.Equal(t, tt[2], g.Output(0).Pop())
 			})
@@ -87,14 +87,14 @@ func TestGate(t *testing.T) {
 
 		t.Run("true가 입력되었을 때, false가 리턴됨", func(t *testing.T) {
 			g.Input(0).Push(true)
-			globalEngine.TickSync()
+			GlobalEngine.TickSync()
 
 			assert.False(t, g.Output(0).Pop())
 		})
 
 		t.Run("false가 입력 되었을 때, true가 반환됨", func(t *testing.T) {
 			g.Input(0).Push(false)
-			globalEngine.TickSync()
+			GlobalEngine.TickSync()
 
 			assert.True(t, g.Output(0).Pop())
 		})
@@ -119,8 +119,8 @@ func TestGate(t *testing.T) {
 				g.Input(1).Push(tt[1])
 
 				// need 2 ticks for or gate and not gate both work
-				globalEngine.TickSync()
-				globalEngine.TickSync()
+				GlobalEngine.TickSync()
+				GlobalEngine.TickSync()
 
 				assert.Equal(t, tt[2], g.Output(0).Pop())
 			})
@@ -146,8 +146,8 @@ func TestGate(t *testing.T) {
 				g.Input(1).Push(tt[1])
 
 				// need 2 ticks for and gate and not gate both work
-				globalEngine.TickSync()
-				globalEngine.TickSync()
+				GlobalEngine.TickSync()
+				GlobalEngine.TickSync()
 
 				assert.Equal(t, tt[2], g.Output(0).Pop())
 			})
@@ -160,13 +160,13 @@ func TestGate_flipflop(t *testing.T) {
 		gate := FlipFlopSR(context.TODO())
 
 		gate.Input(0).Push(true)
-		globalEngine.TickSync()
+		GlobalEngine.TickSync()
 
 		assert.False(t, gate.Output(0).Pop())
 		assert.True(t, gate.Output(1).Pop())
 
 		gate.Input(0).Push(false)
-		globalEngine.TickSync()
+		GlobalEngine.TickSync()
 
 		assert.False(t, gate.Output(0).Pop())
 		assert.True(t, gate.Output(1).Pop())
