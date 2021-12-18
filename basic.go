@@ -2,10 +2,9 @@ package logic_gate
 
 import (
 	"context"
-	"log"
 )
 
-func BasicGate(ctx context.Context) (g *Gate) {
+func BasicGate(ctx context.Context) (g Gate) {
 	truthTable := map[int]bool{
 		0: false,
 		1: true,
