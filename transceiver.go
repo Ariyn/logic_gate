@@ -4,15 +4,17 @@ type Receiver interface{}
 type Transmitter interface{}
 
 type Transceiver struct {
-	status  bool
-	input   chan bool
-	outputs []chan bool
+	status   bool
+	input    chan bool
+	outputs  []chan bool
+	outputs2 []*Transceiver
 }
 
 func NewTransceiver() Transceiver {
 	return Transceiver{
-		input:   make(chan bool),
-		outputs: make([]chan bool, 0),
+		input:    make(chan bool, 1),
+		outputs:  make([]chan bool, 0),
+		outputs2: make([]*Transceiver, 0),
 	}
 }
 

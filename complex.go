@@ -6,8 +6,8 @@ type ComplexGate struct {
 	ctx        context.Context
 	InputSize  int
 	OutputSize int
-	inputs     []chan bool
-	outputs    []chan bool
+	inputs     []Transceiver
+	outputs    []Transceiver
 	gates      []*Gate
 }
 
@@ -15,7 +15,7 @@ func NorGate(ctx context.Context) (g *ComplexGate) {
 	orGate := OrGate(ctx)
 	notGate := NotGate(ctx)
 
-	notGate.inputs[0] = orGate.outputs[0]
+	orGate.outputs[0].outputs = append(orGate.outputs[0].outputs, notGate.inputs[0].input)
 
 	g = &ComplexGate{
 		ctx:        ctx,
@@ -33,7 +33,7 @@ func NandGate(ctx context.Context) (g *ComplexGate) {
 	andGate := AndGate(ctx)
 	notGate := NotGate(ctx)
 
-	notGate.inputs[0] = andGate.outputs[0]
+	andGate.outputs[0].outputs = append(andGate.outputs[0].outputs, notGate.inputs[0].input)
 
 	g = &ComplexGate{
 		ctx:        ctx,
