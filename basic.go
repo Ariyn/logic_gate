@@ -11,7 +11,9 @@ func BasicGate(ctx context.Context) (g *Gate) {
 		1: true,
 	}
 
-	return NewGate(ctx, 2, 1, truthTable)
+	g = NewGate(ctx, 1, 1, truthTable)
+	ConnectGateTicker(g)
+	return
 }
 
 func PrintGate(ctx context.Context) (g *Gate) {
@@ -20,6 +22,7 @@ func PrintGate(ctx context.Context) (g *Gate) {
 		log.Println(g, index, input)
 	})
 
+	ConnectGateTicker(g)
 	return g
 }
 
@@ -31,7 +34,9 @@ func AndGate(ctx context.Context) (g *Gate) {
 		3: true,
 	}
 
-	return NewGate(ctx, 2, 1, truthTable)
+	g = NewGate(ctx, 2, 1, truthTable)
+	ConnectGateTicker(g)
+	return g
 }
 
 func OrGate(ctx context.Context) (g *Gate) {
@@ -42,7 +47,9 @@ func OrGate(ctx context.Context) (g *Gate) {
 		3: true,
 	}
 
-	return NewGate(ctx, 2, 1, truthTable)
+	g = NewGate(ctx, 2, 1, truthTable)
+	ConnectGateTicker(g)
+	return g
 }
 
 func NotGate(ctx context.Context) (g *Gate) {
@@ -51,5 +58,7 @@ func NotGate(ctx context.Context) (g *Gate) {
 		1: false,
 	}
 
-	return NewGate(ctx, 1, 1, truthTable)
+	g = NewGate(ctx, 1, 1, truthTable)
+	ConnectGateTicker(g)
+	return g
 }
