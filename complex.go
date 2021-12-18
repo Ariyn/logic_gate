@@ -58,7 +58,7 @@ func (g *ComplexGate) SetPreviousStatus(status bool) {
 	//g.previousOutput = status
 }
 
-func NorGate(ctx context.Context) (g *ComplexGate) {
+func NorGate(ctx context.Context) (g Gate) {
 	orGate := OrGate(ctx)
 	notGate := NotGate(ctx)
 
@@ -76,7 +76,7 @@ func NorGate(ctx context.Context) (g *ComplexGate) {
 	return
 }
 
-func NandGate(ctx context.Context) (g *ComplexGate) {
+func NandGate(ctx context.Context) (g Gate) {
 	andGate := AndGate(ctx)
 	notGate := NotGate(ctx)
 
@@ -94,7 +94,7 @@ func NandGate(ctx context.Context) (g *ComplexGate) {
 	return
 }
 
-func FlipFlopSR(ctx context.Context) (g *ComplexGate) {
+func FlipFlopSR(ctx context.Context) (g Gate) {
 	rGate := NorGate(ctx)
 	sGate := NorGate(ctx)
 
@@ -102,9 +102,9 @@ func FlipFlopSR(ctx context.Context) (g *ComplexGate) {
 	Connect(sGate.Output(0), rGate.Input(1))
 
 	rGate.Input(1).SetCurrentStatus(true)
-	rGate.gates[0].SetPreviousStatus(false)
-	rGate.gates[1].SetPreviousStatus(true)
-	sGate.gates[0].SetPreviousStatus(true)
+	rGate.(*ComplexGate).gates[0].SetPreviousStatus(false)
+	rGate.(*ComplexGate).gates[1].SetPreviousStatus(true)
+	sGate.(*ComplexGate).gates[0].SetPreviousStatus(true)
 
 	return &ComplexGate{
 		ctx:        ctx,
