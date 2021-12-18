@@ -10,10 +10,10 @@ var _ Gate = (*TruthTableGate)(nil)
 type TruthTableGate struct {
 	name            string
 	ctx             context.Context
-	receiverSize    int           // TODO: receiverSize
-	receivers       []Receiver    // TODO: Receiver
-	transmitterSize int           // TODO: transmitterSize
-	transmitters    []Transmitter // TODO: Transmitter
+	receiverSize    int
+	receivers       []Receiver
+	transmitterSize int
+	transmitters    []Transmitter
 	truthTable      map[int]bool
 	previousOutput  bool
 	handlers        map[HandlerSituation][]gateHandler
