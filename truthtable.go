@@ -8,40 +8,40 @@ import (
 var _ Gate = (*TruthTableGate)(nil)
 
 type TruthTableGate struct {
-	name           string
-	ctx            context.Context
-	inputSize      int            // TODO: receiverSize
-	inputs         []*Transceiver // TODO: Receiver
-	outputSize     int            // TODO: transmitterSize
-	outputs        []*Transceiver // TODO: Transmitter
-	truthTable     map[int]bool
-	previousOutput bool
-	handlers       map[HandlerSituation][]gateHandler
-	tick           chan *sync.WaitGroup
+	name            string
+	ctx             context.Context
+	receiverSize    int           // TODO: receiverSize
+	receivers       []Receiver    // TODO: Receiver
+	transmitterSize int           // TODO: transmitterSize
+	transmitters    []Transmitter // TODO: Transmitter
+	truthTable      map[int]bool
+	previousOutput  bool
+	handlers        map[HandlerSituation][]gateHandler
+	tick            chan *sync.WaitGroup
 }
 
 func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
 	tg := &TruthTableGate{
-		ctx:        ctx,
-		inputSize:  inputSize,
-		outputSize: outputSize,
-		inputs:     make([]*Transceiver, inputSize),
-		outputs:    make([]*Transceiver, outputSize),
-		truthTable: truthTable,
-		handlers:   make(map[HandlerSituation][]gateHandler),
-		tick:       make(chan *sync.WaitGroup),
+		ctx:             ctx,
+		receiverSize:    inputSize,
+		transmitterSize: outputSize,
+		receivers:       make([]Receiver, inputSize),
+		transmitters:    make([]Transmitter, outputSize),
+		truthTable:      truthTable,
+		handlers:        make(map[HandlerSituation][]gateHandler),
+		tick:            make(chan *sync.WaitGroup),
 	}
 
 	for _, situation := range HandlerSituations {
 		tg.handlers[situation] = make([]gateHandler, 0)
 	}
 
-	for i := 0; i < tg.inputSize; i++ {
-		tg.inputs[i] = NewTransceiver()
+	for i := 0; i < tg.receiverSize; i++ {
+		tg.receivers[i] = NewTransceiver()
 	}
 
-	for i := 0; i < tg.outputSize; i++ {
-		tg.outputs[i] = NewTransceiver()
+	for i := 0; i < tg.transmitterSize; i++ {
+		tg.transmitters[i] = NewTransceiver()
 	}
 
 	go tg.run()
@@ -50,19 +50,19 @@ func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTabl
 }
 
 func (g *TruthTableGate) InputSize() (size int) {
-	return g.inputSize
+	return g.receiverSize
 }
 
 func (g *TruthTableGate) Input(index int) (r Receiver) {
-	if g.inputSize < index {
+	if g.receiverSize < index {
 		return nil
 	}
 
-	return g.inputs[index]
+	return g.receivers[index]
 }
 
 func (g *TruthTableGate) Inputs() (rs []Receiver) {
-	for _, r := range g.inputs {
+	for _, r := range g.receivers {
 		rs = append(rs, r)
 	}
 
@@ -70,19 +70,19 @@ func (g *TruthTableGate) Inputs() (rs []Receiver) {
 }
 
 func (g *TruthTableGate) OutputSize() int {
-	return g.outputSize
+	return g.transmitterSize
 }
 
 func (g *TruthTableGate) Output(index int) (t Transmitter) {
-	if g.outputSize < index {
+	if g.transmitterSize < index {
 		return nil
 	}
 
-	return g.outputs[index]
+	return g.transmitters[index]
 }
 
 func (g *TruthTableGate) Outputs() (ts []Transmitter) {
-	for _, r := range g.outputs {
+	for _, r := range g.transmitters {
 		ts = append(ts, r)
 	}
 
@@ -95,7 +95,7 @@ func (g *TruthTableGate) Tick(wg *sync.WaitGroup) {
 
 func (g *TruthTableGate) run() {
 	defer func() {
-		for _, o := range g.outputs {
+		for _, o := range g.transmitters {
 			o.Close()
 		}
 	}()
@@ -107,12 +107,12 @@ func (g *TruthTableGate) run() {
 
 		wg := <-g.tick
 
-		received := make([]bool, g.inputSize)
-		state := make([]bool, g.inputSize)
+		received := make([]bool, g.receiverSize)
+		state := make([]bool, g.receiverSize)
 
-		for i := range g.inputs {
-			received[i] = g.inputs[i].receive()
-			state[i] = g.inputs[i].status
+		for i := range g.receivers {
+			received[i] = g.receivers[i].Receive()
+			state[i] = g.receivers[i].Status()
 		}
 
 		if len(g.handlers[AfterInput]) != 0 {
@@ -121,9 +121,10 @@ func (g *TruthTableGate) run() {
 			//}
 		}
 
+		// TODO: TruthTableGate should return more than 2 outputs
 		next := g.truthTable[g.getTruthTableIndex(state)]
 		if next != g.previousOutput {
-			g.outputs[0].transmit(next)
+			g.transmitters[0].Transmit(next)
 			g.previousOutput = next
 		}
 

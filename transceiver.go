@@ -3,12 +3,16 @@ package logic_gate
 type Receiver interface {
 	Input() chan bool
 	Push(status bool)
+	Receive() bool // TODO: should both Receive and Push exist?
+	Status() bool
 	SetCurrentStatus(status bool)
 }
 
 type Transmitter interface {
 	Pop() bool
+	Transmit(bool) int // TODO: should both Transmit and Pop exist?
 	AppendReceiver(r Receiver)
+	Close()
 }
 
 var _ Receiver = (*Transceiver)(nil)
@@ -33,6 +37,10 @@ func (t *Transceiver) Close() {
 	}
 }
 
+func (t *Transceiver) Status() bool {
+	return t.status
+}
+
 func (t *Transceiver) Push(signal bool) {
 	t.status = signal
 }
@@ -41,7 +49,7 @@ func (t *Transceiver) Pop() (signal bool) {
 	return t.status
 }
 
-func (t *Transceiver) receive() (received bool) {
+func (t *Transceiver) Receive() (received bool) {
 	select {
 	case signal := <-t.input:
 		t.status = signal
@@ -51,7 +59,7 @@ func (t *Transceiver) receive() (received bool) {
 	return
 }
 
-func (t *Transceiver) transmit(status bool) (transmitted int) {
+func (t *Transceiver) Transmit(status bool) (transmitted int) {
 	t.status = status
 
 	transmitted = 0

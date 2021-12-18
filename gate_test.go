@@ -24,16 +24,6 @@ func TestGate(t *testing.T) {
 		})
 	})
 
-	//t.Run("print gate", func(t *testing.T) {
-	//	g := PrintGate(context.Background())
-	//
-	//	g.inputs[0] <- true
-	//	assert.True(t, <-g.Output(0))
-	//
-	//	g.inputs[0] <- false
-	//	assert.False(t, <-g.Output(0))
-	//})
-
 	t.Run("and gate", func(t *testing.T) {
 		testCases := [][]bool{{
 			false, false, false,
