@@ -1,6 +1,9 @@
 package logic_gate
 
-import "context"
+import (
+	"context"
+	"log"
+)
 
 func BasicGate(ctx context.Context) (g *Gate) {
 	truthTable := map[int]bool{
@@ -9,6 +12,15 @@ func BasicGate(ctx context.Context) (g *Gate) {
 	}
 
 	return NewGate(ctx, 2, 1, truthTable)
+}
+
+func PrintGate(ctx context.Context) (g *Gate) {
+	g = BasicGate(ctx)
+	g.handlers[AfterInput] = append(g.handlers[AfterInput], func(g *Gate, index int, input bool) {
+		log.Println(g, index, input)
+	})
+
+	return g
 }
 
 func AndGate(ctx context.Context) (g *Gate) {

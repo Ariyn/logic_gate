@@ -10,6 +10,18 @@ var boolMap = map[bool]int{
 	true:  1,
 }
 
+type HandlerSituation int
+
+const (
+	AfterInput HandlerSituation = iota + 1
+)
+
+var HandlerSituations = []HandlerSituation{
+	AfterInput,
+}
+
+type gateHandler func(g *Gate, index int, input bool)
+
 type Receiver interface {
 	ConnectInput(Transmitter)
 }
@@ -28,6 +40,7 @@ type Gate struct {
 	truthTable     map[int]bool
 	state          []bool
 	previousOutput bool
+	handlers       map[HandlerSituation][]gateHandler
 }
 
 func NewGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g *Gate) {
@@ -39,6 +52,11 @@ func NewGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]
 		outputs:    make([]chan bool, 1),
 		state:      make([]bool, 2),
 		truthTable: truthTable,
+		handlers:   make(map[HandlerSituation][]gateHandler),
+	}
+
+	for _, situation := range HandlerSituations {
+		g.handlers[situation] = make([]gateHandler, 0)
 	}
 
 	for i := 0; i < g.InputSize; i++ {
@@ -78,6 +96,12 @@ func (g *Gate) run() {
 		index, value, recvOk := reflect.Select(cases)
 		if !recvOk {
 			break
+		}
+
+		if len(g.handlers[AfterInput]) != 0 {
+			for _, f := range g.handlers[AfterInput] {
+				f(g, index, value.Bool())
+			}
 		}
 		g.state[index] = value.Bool()
 

@@ -8,9 +8,19 @@ import (
 	"time"
 )
 
-func TestPrintGate(t *testing.T) {
+func TestGate(t *testing.T) {
 	t.Run("basic gate", func(t *testing.T) {
 		g := BasicGate(context.Background())
+
+		g.inputs[0] <- true
+		assert.True(t, <-g.outputs[0])
+
+		g.inputs[0] <- false
+		assert.False(t, <-g.outputs[0])
+	})
+
+	t.Run("print gate", func(t *testing.T) {
+		g := PrintGate(context.Background())
 
 		g.inputs[0] <- true
 		assert.True(t, <-g.outputs[0])
