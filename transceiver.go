@@ -1,20 +1,29 @@
 package logic_gate
 
-type Receiver interface{}
-type Transmitter interface{}
-
-type Transceiver struct {
-	status   bool
-	input    chan bool
-	outputs  []chan bool
-	outputs2 []*Transceiver
+type Receiver interface {
+	Input() chan bool
+	Push(status bool)
+	SetCurrentStatus(status bool)
 }
 
-func NewTransceiver() Transceiver {
-	return Transceiver{
-		input:    make(chan bool, 1),
-		outputs:  make([]chan bool, 0),
-		outputs2: make([]*Transceiver, 0),
+type Transmitter interface {
+	Pop() bool
+	AppendReceiver(r Receiver)
+}
+
+var _ Receiver = (*Transceiver)(nil)
+var _ Transmitter = (*Transceiver)(nil)
+
+type Transceiver struct {
+	status  bool
+	input   chan bool
+	outputs []chan bool
+}
+
+func NewTransceiver() *Transceiver {
+	return &Transceiver{
+		input:   make(chan bool, 1),
+		outputs: make([]chan bool, 0),
 	}
 }
 
@@ -55,4 +64,16 @@ func (t *Transceiver) transmit(status bool) (transmitted int) {
 	}
 
 	return
+}
+
+func (t *Transceiver) SetCurrentStatus(status bool) {
+	t.status = status
+}
+
+func (t *Transceiver) AppendReceiver(r Receiver) {
+	t.outputs = append(t.outputs, r.Input())
+}
+
+func (t *Transceiver) Input() chan bool {
+	return t.input
 }
