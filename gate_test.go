@@ -174,23 +174,176 @@ func TestGate_flipflop(t *testing.T) {
 		// FIX: sometimes, sGate does not work well in 2 ticks.
 		// but it should work in 2 ticks.
 		gate.Input(1).Push(true)
-		globalEngine.TickSync()
-		globalEngine.TickSync()
-		globalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
 
 		assert.True(t, gate.Output(0).Pop())
 		assert.False(t, gate.Output(1).Pop())
 
+		GlobalEngine.TickSync()
+		assert.True(t, gate.Output(0).Pop())
+		assert.False(t, gate.Output(1).Pop())
+
+		GlobalEngine.TickSync()
+		assert.True(t, gate.Output(0).Pop())
+		assert.False(t, gate.Output(1).Pop())
+
 		gate.Input(1).Push(false)
-		globalEngine.TickSync()
+		GlobalEngine.TickSync()
 
 		assert.True(t, gate.Output(0).Pop())
 		assert.False(t, gate.Output(1).Pop())
 	})
 }
 
-//func TestGate_Receiver(t *testing.T) {
-//	g := BasicGate(context.TODO())
-//	printer := PrintGate(context.TODO())
-//	Connect(printer.Input(0), g.Output(0))
-//}
+func TestGate_xor_gate(t *testing.T) {
+	testCases := [][]bool{{
+		false, false, false,
+	}, {
+		false, true, true,
+	}, {
+		true, false, true,
+	}, {
+		true, true, false,
+	}}
+
+	for _, tt := range testCases {
+		t.Run(fmt.Sprintf("when input case is (%v, %v), output is %v", tt[0], tt[1], tt[2]), func(t *testing.T) {
+			xor := ComplexXorGate(context.TODO())
+
+			xor.Input(0).Push(tt[0])
+			xor.Input(1).Push(tt[1])
+			for i := 0; i < 8; i++ {
+				GlobalEngine.TickSync()
+			}
+
+			assert.Equal(t, tt[2], xor.Output(0).Pop())
+		})
+	}
+}
+
+func TestGate_HalfAdder(t *testing.T) {
+	testCases := [][]bool{{
+		false, false, false, false,
+	}, {
+		false, true, true, false,
+	}, {
+		true, false, true, false,
+	}, {
+		true, true, false, true,
+	}}
+
+	for _, tt := range testCases {
+		t.Run(fmt.Sprintf("when input case is (%v, %v), output is %v", tt[0], tt[1], tt[2]), func(t *testing.T) {
+			hfAdder := HalfAdder(context.TODO())
+			hfAdder.Input(0).Push(tt[0])
+			hfAdder.Input(1).Push(tt[1])
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+
+			assert.Equal(t, tt[2], hfAdder.Output(0).Pop())
+			assert.Equal(t, tt[3], hfAdder.Output(1).Pop())
+		})
+	}
+}
+
+func TestGate_FullAdder(t *testing.T) {
+	// 0, 1, carry in, s, carry out
+	testCases := [][]bool{{
+		false, false, false, false, false,
+	}, {
+		false, false, true, true, false,
+	}, {
+		false, true, false, true, false,
+	}, {
+		false, true, true, false, true,
+	}, {
+		true, false, false, true, false,
+	}, {
+		true, false, true, false, true,
+	}, {
+		true, true, false, false, true,
+	}, {
+		true, true, true, true, true,
+	}}
+
+	for _, tt := range testCases {
+		t.Run(fmt.Sprintf("when input case is (%v, %v), output is %v", tt[0], tt[1], tt[2]), func(t *testing.T) {
+			fullAdder := ComplexFullAdder(context.TODO())
+
+			fullAdder.Input(0).Push(tt[0])
+			fullAdder.Input(1).Push(tt[1])
+			fullAdder.Input(2).Push(tt[2])
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+
+			assert.Equal(t, tt[3], fullAdder.Output(0).Pop())
+			assert.Equal(t, tt[4], fullAdder.Output(1).Pop())
+		})
+	}
+}
+
+func TestGate_2BitsFullAdder(t *testing.T) {
+	// A0, A1, B0, B1, S0, S1, c2
+	testCases := [][]bool{{
+		false, false, false, false, false, false, false,
+	}, {
+		true, false, false, false, true, false, false,
+	}, {
+		false, true, false, false, false, true, false,
+	}, {
+		true, true, false, false, true, true, false,
+	}, {
+		false, false, true, false, true, false, false,
+	}, {
+		true, false, true, false, false, true, false,
+	}, {
+		false, true, true, false, true, true, false,
+	}, {
+		true, true, true, false, false, false, true,
+	}, {
+		false, false, false, true, false, true, false,
+	}, {
+		true, false, false, true, true, true, false,
+	}, {
+		false, true, false, true, false, false, true,
+	}, {
+		true, true, false, true, true, false, true,
+	}, {
+		false, false, true, true, true, true, false,
+	}, {
+		true, false, true, true, false, false, true,
+	}, {
+		false, true, true, true, true, false, true,
+	}, {
+		true, true, true, true, false, true, true,
+	}}
+
+	for index, tt := range testCases {
+		t.Run(fmt.Sprintf("%d: when input case is (%v, %v), output is %v", index, tt[0], tt[1], tt[2]), func(t *testing.T) {
+			fullAdder1 := ComplexFullAdder(context.TODO())
+			fullAdder2 := ComplexFullAdder(context.TODO())
+
+			Connect(fullAdder1.Output(1), fullAdder2.Input(2))
+
+			fullAdder1.Input(0).Push(tt[0]) // A0
+			fullAdder2.Input(0).Push(tt[1]) // A1
+			fullAdder1.Input(1).Push(tt[2]) // B0
+			fullAdder2.Input(1).Push(tt[3]) // B1
+
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+			GlobalEngine.TickSync()
+
+			assert.Equal(t, tt[4], fullAdder1.Output(0).Pop(), "s0")
+			assert.Equal(t, tt[5], fullAdder2.Output(0).Pop(), "s1")
+			assert.Equal(t, tt[6], fullAdder2.Output(1).Pop(), "carry-out")
+		})
+	}
+}

@@ -19,10 +19,10 @@ var HandlerSituations = []HandlerSituation{
 
 type Gate interface {
 	InputSize() int
-	Input(index int) Receiver
+	Input(index int) Receiver // TODO: named input
 	Inputs() []Receiver
 	OutputSize() int
-	Output(index int) Transmitter
+	Output(index int) Transmitter // TODO: named output
 	Outputs() []Transmitter
 	Tick(group *sync.WaitGroup)
 	SetPreviousStatus(status bool)

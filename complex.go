@@ -123,3 +123,34 @@ func FlipFlopSR(ctx context.Context) (g Gate) {
 		},
 	}
 }
+
+func ComplexXorGate(ctx context.Context) (g Gate) {
+	input1 := BasicGate(ctx)
+	input2 := BasicGate(ctx)
+
+	nand1 := NandGate(ctx)
+	nand2 := NandGate(ctx)
+	nand3 := NandGate(ctx)
+	nand4 := NandGate(ctx)
+
+	Connect(input1.Output(0), nand1.Input(0))
+	Connect(input2.Output(0), nand1.Input(1))
+
+	Connect(input1.Output(0), nand2.Input(0))
+	Connect(input2.Output(0), nand3.Input(1))
+
+	Connect(nand1.Output(0), nand2.Input(1))
+	Connect(nand1.Output(0), nand3.Input(0))
+
+	Connect(nand2.Output(0), nand4.Input(0))
+	Connect(nand3.Output(0), nand4.Input(1))
+
+	return &ComplexGate{
+		ctx:        ctx,
+		inputSize:  2,
+		outputSize: 1,
+		inputs:     []Receiver{input1.Input(0), input2.Input(0)},
+		outputs:    []Transmitter{nand4.Output(0)},
+		gates:      []Gate{input1, input2, nand1, nand2, nand3, nand4},
+	}
+}
