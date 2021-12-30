@@ -337,3 +337,130 @@ func TestGate_2BitsFullAdder(t *testing.T) {
 		})
 	}
 }
+
+func TestGate_4BitsFullAdder(t *testing.T) {
+	t.Run("0011 + 1100 = 1111", func(t *testing.T) {
+		adder := Complex4BitsFullAdder(context.TODO())
+
+		adder.Input(0).Push(true)
+		adder.Input(1).Push(true)
+		adder.Input(2).Push(false)
+		adder.Input(3).Push(false)
+
+		adder.Input(4).Push(false)
+		adder.Input(5).Push(false)
+		adder.Input(6).Push(true)
+		adder.Input(7).Push(true)
+
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+
+		assert.True(t, adder.Output(0).Pop())
+		assert.True(t, adder.Output(1).Pop())
+		assert.True(t, adder.Output(2).Pop())
+		assert.True(t, adder.Output(3).Pop())
+		assert.False(t, adder.Output(4).Pop())
+	})
+
+	t.Run("1111 + 1100 = 11011", func(t *testing.T) {
+		adder := Complex4BitsFullAdder(context.TODO())
+
+		adder.Input(0).Push(true)
+		adder.Input(1).Push(true)
+		adder.Input(2).Push(true)
+		adder.Input(3).Push(true)
+
+		adder.Input(4).Push(false)
+		adder.Input(5).Push(false)
+		adder.Input(6).Push(true)
+		adder.Input(7).Push(true)
+
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+
+		assert.True(t, adder.Output(0).Pop())
+		assert.True(t, adder.Output(1).Pop())
+		assert.False(t, adder.Output(2).Pop())
+		assert.True(t, adder.Output(3).Pop())
+		assert.True(t, adder.Output(4).Pop())
+	})
+}
+
+func TestGate_4BitsFullSubtractor(t *testing.T) {
+	// 1100 = 12
+	// 0011 = 3
+	// 12 - 3 = 9 // 1001
+	t.Run("1100 - 0011 = 1001", func(t *testing.T) {
+		subtractor := Complex4BitsFullSubtractor(context.Background())
+
+		subtractor.Input(0).Push(false)
+		subtractor.Input(1).Push(false)
+		subtractor.Input(2).Push(true)
+		subtractor.Input(3).Push(true)
+
+		subtractor.Input(4).Push(true)
+		subtractor.Input(5).Push(true)
+		subtractor.Input(6).Push(false)
+		subtractor.Input(7).Push(false)
+
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+
+		assert.True(t, subtractor.Output(0).Pop())
+		assert.False(t, subtractor.Output(1).Pop())
+		assert.False(t, subtractor.Output(2).Pop())
+		assert.True(t, subtractor.Output(3).Pop())
+	})
+
+	t.Run("0011 - 0011 = 0000", func(t *testing.T) {
+		subtractor := Complex4BitsFullSubtractor(context.Background())
+
+		subtractor.Input(0).Push(true)
+		subtractor.Input(1).Push(true)
+		subtractor.Input(2).Push(false)
+		subtractor.Input(3).Push(false)
+
+		subtractor.Input(4).Push(true)
+		subtractor.Input(5).Push(true)
+		subtractor.Input(6).Push(false)
+		subtractor.Input(7).Push(false)
+
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+
+		assert.False(t, subtractor.Output(0).Pop())
+		assert.False(t, subtractor.Output(1).Pop())
+		assert.False(t, subtractor.Output(2).Pop())
+		assert.False(t, subtractor.Output(3).Pop())
+		assert.True(t, subtractor.Output(4).Pop())
+	})
+
+	t.Run("0000 - 0011 = underflow", func(t *testing.T) {
+		subtractor := Complex4BitsFullSubtractor(context.Background())
+
+		subtractor.Input(0).Push(false)
+		subtractor.Input(1).Push(false)
+		subtractor.Input(2).Push(false)
+		subtractor.Input(3).Push(false)
+
+		subtractor.Input(4).Push(true)
+		subtractor.Input(5).Push(true)
+		subtractor.Input(6).Push(false)
+		subtractor.Input(7).Push(false)
+
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+		GlobalEngine.TickSync()
+
+		assert.True(t, subtractor.Output(0).Pop())
+		assert.False(t, subtractor.Output(1).Pop())
+		assert.True(t, subtractor.Output(2).Pop())
+		assert.True(t, subtractor.Output(3).Pop())
+		assert.False(t, subtractor.Output(4).Pop())
+	})
+}

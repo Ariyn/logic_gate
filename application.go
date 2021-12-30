@@ -64,3 +64,60 @@ func ComplexFullAdder(ctx context.Context) (g Gate) {
 
 	return
 }
+
+func Complex4BitsFullAdder(ctx context.Context) (g Gate) {
+	a1 := ComplexFullAdder(ctx)
+	a2 := ComplexFullAdder(ctx)
+	a3 := ComplexFullAdder(ctx)
+	a4 := ComplexFullAdder(ctx)
+
+	Connect(a1.Output(1), a2.Input(2))
+	Connect(a2.Output(1), a3.Input(2))
+	Connect(a3.Output(1), a4.Input(2))
+
+	g = &ComplexGate{
+		ctx:        ctx,
+		inputSize:  8,
+		outputSize: 5,
+		inputs:     []Receiver{a1.Input(0), a2.Input(0), a3.Input(0), a4.Input(0), a1.Input(1), a2.Input(1), a3.Input(1), a4.Input(1)},
+		outputs:    []Transmitter{a1.Output(0), a2.Output(0), a3.Output(0), a4.Output(0), a4.Output(1)},
+		gates:      []Gate{a1, a2, a3, a4},
+	}
+	return
+}
+
+func Complex4BitsFullSubtractor(ctx context.Context) (g Gate) {
+	a1 := ComplexFullAdder(ctx)
+	a2 := ComplexFullAdder(ctx)
+	a3 := ComplexFullAdder(ctx)
+	a4 := ComplexFullAdder(ctx)
+
+	Connect(a1.Output(1), a2.Input(2))
+	Connect(a2.Output(1), a3.Input(2))
+	Connect(a3.Output(1), a4.Input(2))
+
+	a1.Input(2).Push(true)
+
+	not1 := NotGate(ctx)
+	Connect(not1.Output(0), a1.Input(1))
+
+	not2 := NotGate(ctx)
+	Connect(not2.Output(0), a2.Input(1))
+
+	not3 := NotGate(ctx)
+	Connect(not3.Output(0), a3.Input(1))
+
+	not4 := NotGate(ctx)
+	Connect(not4.Output(0), a4.Input(1))
+
+	g = &ComplexGate{
+		ctx:        ctx,
+		inputSize:  8,
+		outputSize: 5,
+		inputs:     []Receiver{a1.Input(0), a2.Input(0), a3.Input(0), a4.Input(0), not1.Input(0), not2.Input(0), not3.Input(0), not4.Input(0)},
+		outputs:    []Transmitter{a1.Output(0), a2.Output(0), a3.Output(0), a4.Output(0), a4.Output(1)},
+		gates:      []Gate{a1, a2, a3, a4, not1, not2, not3, not4},
+	}
+
+	return
+}
