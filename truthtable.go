@@ -18,6 +18,7 @@ type TruthTableGate struct {
 	previousOutput  bool
 	handlers        map[HandlerSituation][]gateHandler
 	tick            chan *sync.WaitGroup
+	isRunning       bool
 }
 
 func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
@@ -100,35 +101,37 @@ func (g *TruthTableGate) run() {
 		}
 	}()
 
-	for {
-		if err := g.ctx.Err(); err != nil {
+	g.isRunning = true
+
+	for g.isRunning {
+		select {
+		case <-g.ctx.Done():
+			g.isRunning = false
 			break
+		case wg := <-g.tick:
+			received := make([]bool, g.receiverSize)
+			state := make([]bool, g.receiverSize)
+
+			for i := range g.receivers {
+				received[i] = g.receivers[i].Receive()
+				state[i] = g.receivers[i].Status()
+			}
+
+			if len(g.handlers[AfterInput]) != 0 {
+				//for _, f := range g.handlers[AfterInput] {
+				//f(g, index, value.Bool())
+				//}
+			}
+
+			// TODO: TruthTableGate should return more than 2 outputs
+			next := g.truthTable[g.getTruthTableIndex(state)]
+			if next != g.previousOutput {
+				g.transmitters[0].Transmit(next)
+				g.previousOutput = next
+			}
+
+			wg.Done()
 		}
-
-		wg := <-g.tick
-
-		received := make([]bool, g.receiverSize)
-		state := make([]bool, g.receiverSize)
-
-		for i := range g.receivers {
-			received[i] = g.receivers[i].Receive()
-			state[i] = g.receivers[i].Status()
-		}
-
-		if len(g.handlers[AfterInput]) != 0 {
-			//for _, f := range g.handlers[AfterInput] {
-			//f(g, index, value.Bool())
-			//}
-		}
-
-		// TODO: TruthTableGate should return more than 2 outputs
-		next := g.truthTable[g.getTruthTableIndex(state)]
-		if next != g.previousOutput {
-			g.transmitters[0].Transmit(next)
-			g.previousOutput = next
-		}
-
-		wg.Done()
 	}
 }
 
