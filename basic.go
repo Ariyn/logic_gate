@@ -11,7 +11,12 @@ func BasicGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, 1, 1, truthTable)
-	if GlobalEngine != nil {
+
+	engine := ctx.Value(EngineKey)
+
+	if e, ok := engine.(Engine); engine != nil && ok {
+		e.ConnectGateTicker(g)
+	} else if GlobalEngine != nil {
 		GlobalEngine.ConnectGateTicker(g)
 	}
 	return

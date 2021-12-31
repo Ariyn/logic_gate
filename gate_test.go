@@ -392,7 +392,8 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 	// 0011 = 3
 	// 12 - 3 = 9 // 1001
 	t.Run("1100 - 0011 = 1001", func(t *testing.T) {
-		subtractor := Complex4BitsFullSubtractor(context.Background())
+		e := NewEngine()
+		subtractor := Complex4BitsFullSubtractor(context.WithValue(context.Background(), EngineKey, e))
 
 		subtractor.Input(0).Push(false)
 		subtractor.Input(1).Push(false)
@@ -404,9 +405,9 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 		subtractor.Input(6).Push(false)
 		subtractor.Input(7).Push(false)
 
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
+		e.TickSync()
+		e.TickSync()
+		e.TickSync()
 
 		assert.True(t, subtractor.Output(0).Pop())
 		assert.False(t, subtractor.Output(1).Pop())
@@ -415,7 +416,8 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 	})
 
 	t.Run("0011 - 0011 = 0000", func(t *testing.T) {
-		subtractor := Complex4BitsFullSubtractor(context.Background())
+		e := NewEngine()
+		subtractor := Complex4BitsFullSubtractor(context.WithValue(context.Background(), EngineKey, e))
 
 		subtractor.Input(0).Push(true)
 		subtractor.Input(1).Push(true)
@@ -427,11 +429,11 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 		subtractor.Input(6).Push(false)
 		subtractor.Input(7).Push(false)
 
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
+		e.TickSync()
+		e.TickSync()
+		e.TickSync()
+		e.TickSync()
+		e.TickSync()
 
 		assert.False(t, subtractor.Output(0).Pop())
 		assert.False(t, subtractor.Output(1).Pop())
@@ -441,7 +443,8 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 	})
 
 	t.Run("0000 - 0011 = underflow", func(t *testing.T) {
-		subtractor := Complex4BitsFullSubtractor(context.Background())
+		e := NewEngine()
+		subtractor := Complex4BitsFullSubtractor(context.WithValue(context.Background(), EngineKey, e))
 
 		subtractor.Input(0).Push(false)
 		subtractor.Input(1).Push(false)
@@ -453,9 +456,9 @@ func TestGate_4BitsFullSubtractor(t *testing.T) {
 		subtractor.Input(6).Push(false)
 		subtractor.Input(7).Push(false)
 
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
-		GlobalEngine.TickSync()
+		e.TickSync()
+		e.TickSync()
+		e.TickSync()
 
 		assert.True(t, subtractor.Output(0).Pop())
 		assert.False(t, subtractor.Output(1).Pop())

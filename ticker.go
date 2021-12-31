@@ -2,6 +2,8 @@ package logic_gate
 
 import "sync"
 
+const EngineKey = "_ENGINE"
+
 var GlobalEngine *Engine
 
 func init() {
