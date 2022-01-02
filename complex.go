@@ -9,11 +9,16 @@ var _ Gate = (*ComplexGate)(nil)
 
 type ComplexGate struct {
 	ctx        context.Context
+	name       string
 	inputSize  int
 	outputSize int
 	inputs     []Receiver
 	outputs    []Transmitter
 	gates      []Gate
+}
+
+func (g *ComplexGate) Name() string {
+	return g.name
 }
 
 func (g *ComplexGate) InputSize() int {

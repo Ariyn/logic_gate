@@ -18,6 +18,7 @@ var HandlerSituations = []HandlerSituation{
 }
 
 type Gate interface {
+	Name() string
 	InputSize() int
 	Input(index int) Receiver // TODO: named input
 	Inputs() []Receiver

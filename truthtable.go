@@ -21,9 +21,10 @@ type TruthTableGate struct {
 	isRunning       bool
 }
 
-func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
+func NewTruthTableGate(ctx context.Context, name string, inputSize, outputSize int, truthTable map[int]bool) (g Gate) {
 	tg := &TruthTableGate{
 		ctx:             ctx,
+		name:            name,
 		receiverSize:    inputSize,
 		transmitterSize: outputSize,
 		receivers:       make([]Receiver, inputSize),
@@ -48,6 +49,10 @@ func NewTruthTableGate(ctx context.Context, inputSize, outputSize int, truthTabl
 	go tg.run()
 
 	return tg
+}
+
+func (g *TruthTableGate) Name() string {
+	return g.name
 }
 
 func (g *TruthTableGate) InputSize() (size int) {

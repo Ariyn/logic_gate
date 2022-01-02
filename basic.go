@@ -10,7 +10,7 @@ func BasicGate(ctx context.Context) (g Gate) {
 		1: true,
 	}
 
-	g = NewTruthTableGate(ctx, 1, 1, truthTable)
+	g = NewTruthTableGate(ctx, "BasicInput", 1, 1, truthTable)
 
 	engine := ctx.Value(EngineKey)
 
@@ -58,7 +58,7 @@ func OrGate(ctx context.Context) (g Gate) {
 		3: true,
 	}
 
-	g = NewTruthTableGate(ctx, 2, 1, truthTable)
+	g = NewTruthTableGate(ctx, "OrGate", 2, 1, truthTable)
 	if GlobalEngine != nil {
 		GlobalEngine.ConnectGateTicker(g)
 	}
@@ -72,7 +72,7 @@ func NotGate(ctx context.Context) (g Gate) {
 		1: false,
 	}
 
-	g = NewTruthTableGate(ctx, 1, 1, truthTable)
+	g = NewTruthTableGate(ctx, "NotGate", 1, 1, truthTable)
 	if GlobalEngine != nil {
 		GlobalEngine.ConnectGateTicker(g)
 	}
@@ -88,7 +88,7 @@ func XorGate(ctx context.Context) (g Gate) {
 		3: false,
 	}
 
-	g = NewTruthTableGate(ctx, 2, 1, truthTable)
+	g = NewTruthTableGate(ctx, "XorGate", 2, 1, truthTable)
 	if GlobalEngine != nil {
 		GlobalEngine.ConnectGateTicker(g)
 	}
