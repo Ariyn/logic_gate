@@ -17,6 +17,18 @@ type ComplexGate struct {
 	gates      []Gate
 }
 
+func NewComplexGate(ctx context.Context, name string, inputs []Receiver, outputs []Transmitter, gates []Gate) Gate {
+	return &ComplexGate{
+		ctx:        ctx,
+		name:       name,
+		inputSize:  len(inputs),
+		inputs:     inputs,
+		outputSize: len(outputs),
+		outputs:    outputs,
+		gates:      gates,
+	}
+}
+
 func (g *ComplexGate) Name() string {
 	return g.name
 }

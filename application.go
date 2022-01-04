@@ -2,30 +2,6 @@ package logic_gate
 
 import "context"
 
-func HalfAdder(ctx context.Context) (hfAdder Gate) {
-	xor := XorGate(ctx)
-	and := AndGate(ctx)
-
-	inputDigit0 := BasicGate(ctx)
-	inputDigit1 := BasicGate(ctx)
-
-	Connect(inputDigit0.Output(0), xor.Input(0))
-	Connect(inputDigit1.Output(0), xor.Input(1))
-	Connect(inputDigit0.Output(0), and.Input(0))
-	Connect(inputDigit1.Output(0), and.Input(1))
-
-	hfAdder = &ComplexGate{
-		ctx:        ctx,
-		inputSize:  2,
-		outputSize: 2,
-		inputs:     []Receiver{inputDigit0.Input(0), inputDigit1.Input(0)},
-		outputs:    []Transmitter{xor.Output(0), and.Output(0)},
-		gates:      []Gate{inputDigit0, inputDigit1, xor, and},
-	}
-
-	return
-}
-
 func ComplexFullAdder(ctx context.Context) (g Gate) {
 	xor1 := XorGate(ctx)
 	xor2 := XorGate(ctx)
