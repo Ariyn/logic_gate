@@ -1,6 +1,10 @@
 package logic_gate
 
-import "sync"
+import (
+	"fmt"
+	"strings"
+	"sync"
+)
 
 const EngineKey = "_ENGINE"
 
@@ -21,8 +25,12 @@ func NewEngine() (e *Engine) {
 	}
 }
 
-func (e *Engine) ConnectGateTicker(g Gate) {
+func (e *Engine) ConnectGateTicker(g Gate) (index int) {
 	e.gates = append(e.gates, g)
+
+	return len(e.gates)
+}
+
 }
 
 // TODO: record every gate's status
