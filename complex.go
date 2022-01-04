@@ -159,3 +159,9 @@ func ComplexXorGate(ctx context.Context) (g Gate) {
 		gates:      []Gate{input1, input2, nand1, nand2, nand3, nand4},
 	}
 }
+
+func (g *ComplexGate) AddHandler(situation HandlerSituation, handler GateHandler) {
+	for _, gate := range g.gates {
+		gate.AddHandler(situation, handler)
+	}
+}

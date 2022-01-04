@@ -13,9 +13,19 @@ const (
 	AfterInput HandlerSituation = iota + 1
 )
 
+func (h HandlerSituation) String() string {
+	switch h {
+	case AfterInput:
+		return "AfterInput"
+	}
+	return "unknown"
+}
+
 var HandlerSituations = []HandlerSituation{
 	AfterInput,
 }
+
+type GateHandler func(g Gate, index int, input bool)
 
 type Gate interface {
 	Name() string
@@ -27,9 +37,8 @@ type Gate interface {
 	Outputs() []Transmitter
 	Tick(group *sync.WaitGroup)
 	SetPreviousStatus(status bool)
+	AddHandler(situation HandlerSituation, handler GateHandler)
 }
-
-type gateHandler func(g *Gate, index int, input bool)
 
 func Connect(t Transmitter, r Receiver) {
 	t.AppendReceiver(r)

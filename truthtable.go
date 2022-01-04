@@ -16,7 +16,7 @@ type TruthTableGate struct {
 	transmitters    []Transmitter
 	truthTable      map[int]bool
 	previousOutput  bool
-	handlers        map[HandlerSituation][]gateHandler
+	handlers        map[HandlerSituation][]GateHandler
 	tick            chan *sync.WaitGroup
 	isRunning       bool
 }
@@ -30,12 +30,12 @@ func NewTruthTableGate(ctx context.Context, name string, inputSize, outputSize i
 		receivers:       make([]Receiver, inputSize),
 		transmitters:    make([]Transmitter, outputSize),
 		truthTable:      truthTable,
-		handlers:        make(map[HandlerSituation][]gateHandler),
+		handlers:        make(map[HandlerSituation][]GateHandler),
 		tick:            make(chan *sync.WaitGroup),
 	}
 
 	for _, situation := range HandlerSituations {
-		tg.handlers[situation] = make([]gateHandler, 0)
+		tg.handlers[situation] = make([]GateHandler, 0)
 	}
 
 	for i := 0; i < tg.receiverSize; i++ {
@@ -123,9 +123,11 @@ func (g *TruthTableGate) run() {
 			}
 
 			if len(g.handlers[AfterInput]) != 0 {
-				//for _, f := range g.handlers[AfterInput] {
-				//f(g, index, value.Bool())
-				//}
+				for _, f := range g.handlers[AfterInput] {
+					for i := range state {
+						f(g, i, state[i])
+					}
+				}
 			}
 
 			// TODO: TruthTableGate should return more than 2 outputs
@@ -150,4 +152,10 @@ func (g *TruthTableGate) getTruthTableIndex(state []bool) (index int) {
 
 func (g *TruthTableGate) SetPreviousStatus(status bool) {
 	g.previousOutput = status
+}
+
+func (g *TruthTableGate) AddHandler(situation HandlerSituation, handler GateHandler) {
+	if _, ok := g.handlers[situation]; ok {
+		g.handlers[situation] = append(g.handlers[situation], handler)
+	}
 }
