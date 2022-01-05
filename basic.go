@@ -2,7 +2,6 @@ package logic_gate
 
 import (
 	"context"
-	"fmt"
 )
 
 func BasicGate(ctx context.Context) (g Gate) {
@@ -12,16 +11,6 @@ func BasicGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, "BasicInput", 1, 1, truthTable)
-
-	var id int
-	engine := ctx.Value(EngineKey)
-	if e, ok := engine.(Engine); engine != nil && ok {
-		id = e.ConnectGateTicker(g)
-	} else if GlobalEngine != nil {
-		id = GlobalEngine.ConnectGateTicker(g)
-	}
-
-	g.(*TruthTableGate).name = fmt.Sprintf("%s %d", g.Name(), id)
 	return
 }
 
@@ -46,16 +35,6 @@ func AndGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, "AndGate", 2, 1, truthTable)
-
-	var id int
-	engine := ctx.Value(EngineKey)
-	if e, ok := engine.(*Engine); engine != nil && ok {
-		id = e.ConnectGateTicker(g)
-	} else if GlobalEngine != nil {
-		id = GlobalEngine.ConnectGateTicker(g)
-	}
-
-	g.(*TruthTableGate).name = fmt.Sprintf("%s %d", g.Name(), id)
 	return g
 }
 
@@ -68,16 +47,6 @@ func OrGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, "OrGate", 2, 1, truthTable)
-
-	var id int
-	engine := ctx.Value(EngineKey)
-	if e, ok := engine.(Engine); engine != nil && ok {
-		id = e.ConnectGateTicker(g)
-	} else if GlobalEngine != nil {
-		id = GlobalEngine.ConnectGateTicker(g)
-	}
-
-	g.(*TruthTableGate).name = fmt.Sprintf("%s %d", g.Name(), id)
 	return g
 }
 
@@ -88,16 +57,6 @@ func NotGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, "NotGate", 1, 1, truthTable)
-
-	var id int
-	engine := ctx.Value(EngineKey)
-	if e, ok := engine.(Engine); engine != nil && ok {
-		id = e.ConnectGateTicker(g)
-	} else if GlobalEngine != nil {
-		id = GlobalEngine.ConnectGateTicker(g)
-	}
-
-	g.(*TruthTableGate).name = fmt.Sprintf("%s %d", g.Name(), id)
 	return g
 }
 
@@ -110,15 +69,5 @@ func XorGate(ctx context.Context) (g Gate) {
 	}
 
 	g = NewTruthTableGate(ctx, "XorGate", 2, 1, truthTable)
-
-	var id int
-	engine := ctx.Value(EngineKey)
-	if e, ok := engine.(Engine); engine != nil && ok {
-		id = e.ConnectGateTicker(g)
-	} else if GlobalEngine != nil {
-		id = GlobalEngine.ConnectGateTicker(g)
-	}
-
-	g.(*TruthTableGate).name = fmt.Sprintf("%s %d", g.Name(), id)
 	return
 }

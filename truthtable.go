@@ -2,6 +2,7 @@ package logic_gate
 
 import (
 	"context"
+	"fmt"
 	"sync"
 )
 
@@ -45,6 +46,16 @@ func NewTruthTableGate(ctx context.Context, name string, inputSize, outputSize i
 	for i := 0; i < tg.transmitterSize; i++ {
 		tg.transmitters[i] = NewTransceiver()
 	}
+
+	var id int
+	engine := ctx.Value(EngineKey)
+	if e, ok := engine.(*Engine); engine != nil && ok {
+		id = e.ConnectGateTicker(tg)
+	} else if GlobalEngine != nil {
+		id = GlobalEngine.ConnectGateTicker(tg)
+	}
+
+	tg.name = fmt.Sprintf("%s %d", tg.Name(), id)
 
 	go tg.run()
 
