@@ -75,24 +75,6 @@ func (g *ComplexGate) SetPreviousStatus(status bool) {
 	//g.previousOutput = status
 }
 
-func NorGate(ctx context.Context) (g Gate) {
-	orGate := OrGate(ctx)
-	notGate := NotGate(ctx)
-
-	Connect(orGate.Output(0), notGate.Input(0))
-
-	g = &ComplexGate{
-		ctx:        ctx,
-		inputSize:  orGate.InputSize(),
-		outputSize: notGate.OutputSize(),
-		inputs:     orGate.Inputs(),
-		outputs:    notGate.Outputs(),
-		gates:      []Gate{orGate, notGate},
-	}
-
-	return
-}
-
 func NandGate(ctx context.Context) (g Gate) {
 	andGate := AndGate(ctx)
 	notGate := NotGate(ctx)
